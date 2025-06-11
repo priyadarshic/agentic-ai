@@ -18,8 +18,10 @@ public class SequentialAgentExample {
     public static void main(String[] args) {
         SequentialAgentExample sequentialAgentExample = new SequentialAgentExample();
         sequentialAgentExample.runAgent(
-                "Write a Java function to calculate the factorial of a number.");
+                "Write a Java function to create a simple webcrawler");
     }
+//    "Write a Java function to find if the string is a Palindrome."
+//    "Write a Java function to calculate the factorial of a number."
 
     public void runAgent(String prompt) {
 
