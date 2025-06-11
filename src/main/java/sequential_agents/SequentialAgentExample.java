@@ -104,7 +104,7 @@ public class SequentialAgentExample {
                 SequentialAgent.builder()
                         .name(APP_NAME)
                         .description("Executes a sequence of code writing, reviewing, and refactoring.")
-                        // The agents will run in the order provided: Writer -> Reviewer -> Refactorer
+                        // The agents will run in the order provided: Writer -> Review -> Refactor
                         .subAgents(codeWriterAgent, codeReviewerAgent, codeRefactorerAgent)
                         .build();
 
