@@ -9,6 +9,7 @@ import com.google.genai.types.Content;
 import com.google.genai.types.Part;
 import io.reactivex.rxjava3.core.Flowable;
 
+// Create Java Code - LLM
 public class SequentialAgentExample {
 
     private static final String APP_NAME = "CodePipelineAgent";
@@ -18,10 +19,11 @@ public class SequentialAgentExample {
     public static void main(String[] args) {
         SequentialAgentExample sequentialAgentExample = new SequentialAgentExample();
         sequentialAgentExample.runAgent(
-                "Write a Java function to create a simple webcrawler");
+                "Write a Java program to lucidly explain through Comments and solve the Travelling Salesman Algorithm");
     }
 //    "Write a Java function to find if the string is a Palindrome."
 //    "Write a Java function to calculate the factorial of a number."
+//    Write a Java function to create a simple webcrawler
 
     public void runAgent(String prompt) {
 

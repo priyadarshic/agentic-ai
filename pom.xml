@@ -57,6 +57,24 @@
 			<version>1.10.2</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.anthropic/anthropic-java -->
+		<dependency>
+			<groupId>com.anthropic</groupId>
+			<artifactId>anthropic-java</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.anthropic/anthropic-java-core -->
+		<dependency>
+			<groupId>com.anthropic</groupId>
+			<artifactId>anthropic-java-core</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.anthropic</groupId>
+			<artifactId>anthropic-java-client-okhttp</artifactId>
+			<version>1.4.0</version>
+		</dependency>
 
 	</dependencies>
 
