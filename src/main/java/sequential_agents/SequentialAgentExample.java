@@ -19,11 +19,15 @@ public class SequentialAgentExample {
     public static void main(String[] args) {
         SequentialAgentExample sequentialAgentExample = new SequentialAgentExample();
         sequentialAgentExample.runAgent(
-                "Write a Java program to lucidly explain through Comments and solve the Travelling Salesman Algorithm");
+                "Write a Java program to lucidly explain through Comments and Create a Doubly Linked List");
     }
-//    "Write a Java function to find if the string is a Palindrome."
-//    "Write a Java function to calculate the factorial of a number."
+//    Write a Java function to find if the string is a Palindrome
+//    Write a Java function to calculate the factorial of a number
 //    Write a Java function to create a simple webcrawler
+//    Write a Java program to lucidly explain through Comments and solve the Travelling Salesman Algorithm
+//    Write a Java program to lucidly explain through Comments and invert a Binary Tree
+//    Write a Java program to lucidly explain through Comments and create a Web Server
+//    Write a Java program to lucidly explain through Comments and create a Web Server that returns the Server Data
 
     public void runAgent(String prompt) {
 
