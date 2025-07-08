@@ -1,0 +1,281 @@
+erDiagram
+    %% Core Entity Definitions
+    CLIENT {
+        string client_id PK
+        string client_type "Individual/Institutional"
+        string first_name
+        string last_name
+        string company_name
+        string email
+        string phone
+        string address
+        string city
+        string country
+        string postal_code
+        string tax_id
+        string kyc_status "Pending/Approved/Rejected"
+        datetime onboarding_date
+        string risk_profile "Conservative/Moderate/Aggressive"
+        decimal net_worth
+        string accredited_status "Yes/No"
+        datetime created_at
+        datetime updated_at
+        boolean is_active
+    }
+
+    CLIENT_DOCUMENTS {
+        string doc_id PK
+        string client_id FK
+        string document_type "ID/Passport/Financial_Statement/Tax_Return"
+        string file_path
+        string file_name
+        datetime upload_date
+        string verification_status "Pending/Verified/Rejected"
+        string verified_by
+        datetime verified_date
+    }
+
+    FUND {
+        string fund_id PK
+        string fund_name
+        string fund_type "Mutual/Hedge/Private_Equity/Real_Estate"
+        string fund_manager_id FK
+        string strategy
+        decimal minimum_investment
+        decimal management_fee_pct
+        decimal performance_fee_pct
+        string currency
+        date inception_date
+        decimal total_aum
+        string fund_status "Active/Closed/Liquidating"
+        string domicile
+        string regulatory_status
+        datetime created_at
+        datetime updated_at
+        boolean is_published
+    }
+
+    FUND_MANAGER {
+        string manager_id PK
+        string company_name
+        string manager_name
+        string email
+        string phone
+        string address
+        string biography
+        decimal years_experience
+        decimal total_aum_managed
+        string regulatory_status
+        datetime created_at
+        datetime updated_at
+    }
+
+    FUND_PERFORMANCE {
+        string performance_id PK
+        string fund_id FK
+        date performance_date
+        decimal nav_per_share
+        decimal total_return_pct
+        decimal benchmark_return_pct
+        decimal volatility_pct
+        decimal sharpe_ratio
+        decimal max_drawdown_pct
+        decimal assets_under_management
+        integer number_of_investors
+    }
+
+    INVESTMENT {
+        string investment_id PK
+        string client_id FK
+        string fund_id FK
+        decimal investment_amount
+        decimal shares_purchased
+        decimal price_per_share
+        date investment_date
+        string investment_status "Pending/Confirmed/Redeemed"
+        string transaction_type "Subscription/Redemption"
+        decimal current_value
+        decimal unrealized_gain_loss
+        datetime created_at
+        datetime updated_at
+    }
+
+    FUND_PERMISSIONS {
+        string permission_id PK
+        string fund_id FK
+        string user_id FK
+        string permission_type "View/Edit/Manage/Admin"
+        datetime granted_date
+        string granted_by
+        boolean is_active
+    }
+
+    INVESTOR_INTRODUCTION {
+        string introduction_id PK
+        string client_id FK
+        string fund_id FK
+        string introducer_id FK
+        string introduction_status "Requested/Pending/Approved/Rejected/Completed"
+        text introduction_message
+        datetime request_date
+        datetime response_date
+        string response_message
+        decimal introduction_fee_pct
+        boolean fee_paid
+    }
+
+    CONTENT {
+        string content_id PK
+        string content_type "News/Research/Market_Data/JPM_CAG"
+        string title
+        text content_body
+        string author
+        date publish_date
+        string status "Draft/Published/Archived"
+        string category
+        text tags
+        string file_path
+        integer view_count
+        datetime created_at
+        datetime updated_at
+    }
+
+    MARKET_DATA {
+        string market_data_id PK
+        string symbol
+        string asset_class "Equity/Bond/Currency/Commodity"
+        decimal price
+        decimal change_pct
+        decimal volume
+        date market_date
+        string exchange
+        datetime created_at
+    }
+
+    USER {
+        string user_id PK
+        string username
+        string email
+        string password_hash
+        string user_type "Client/Admin/Fund_Manager/Analyst"
+        string first_name
+        string last_name
+        string phone
+        datetime last_login
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    USER_PERMISSIONS {
+        string permission_id PK
+        string user_id FK
+        string module_name "Client/Funds/Introductions/Content/Analytics"
+        string permission_level "Read/Write/Admin"
+        datetime granted_date
+        boolean is_active
+    }
+
+    ANALYTICS_REPORT {
+        string report_id PK
+        string report_type "Performance/Strategy/Introduction"
+        string title
+        string generated_by FK
+        datetime generation_date
+        text report_data
+        string file_path
+        string report_format "PDF/Excel/JSON"
+        text parameters
+    }
+
+    FUND_ANALYSIS {
+        string analysis_id PK
+        string fund_id FK
+        string analysis_type "Performance/Risk/Attribution"
+        date analysis_date
+        text analysis_results
+        string analyst_id FK
+        decimal confidence_score
+        text recommendations
+        datetime created_at
+    }
+
+    PEER_ANALYSIS {
+        string peer_analysis_id PK
+        string fund_id FK
+        string benchmark_type "Category/Index/Custom"
+        date analysis_date
+        decimal peer_ranking_percentile
+        decimal relative_performance
+        text peer_group_definition
+        datetime created_at
+    }
+
+    FUND_GROUPS {
+        string group_id PK
+        string group_name
+        string group_type "Asset_Class/Strategy/Geography"
+        text description
+        datetime created_at
+        datetime updated_at
+    }
+
+    FUND_GROUP_MAPPING {
+        string mapping_id PK
+        string fund_id FK
+        string group_id FK
+        datetime assigned_date
+        boolean is_active
+    }
+
+    SHARE_FUND_REQUESTS {
+        string request_id PK
+        string fund_id FK
+        string requested_by FK
+        string requested_to FK
+        string request_status "Pending/Approved/Rejected"
+        text request_message
+        datetime request_date
+        datetime response_date
+        text response_message
+    }
+
+    AUDIT_LOG {
+        string log_id PK
+        string user_id FK
+        string action_type "Create/Update/Delete/View"
+        string entity_type "Client/Fund/Investment/Content"
+        string entity_id
+        text old_values
+        text new_values
+        datetime action_timestamp
+        string ip_address
+        string user_agent
+    }
+
+    %% Relationships
+    CLIENT ||--o{ CLIENT_DOCUMENTS : "has"
+    CLIENT ||--o{ INVESTMENT : "makes"
+    CLIENT ||--o{ INVESTOR_INTRODUCTION : "requests"
+    
+    FUND ||--o{ INVESTMENT : "receives"
+    FUND ||--|| FUND_MANAGER : "managed_by"
+    FUND ||--o{ FUND_PERFORMANCE : "has"
+    FUND ||--o{ FUND_PERMISSIONS : "has"
+    FUND ||--o{ INVESTOR_INTRODUCTION : "involves"
+    FUND ||--o{ FUND_ANALYSIS : "analyzed_in"
+    FUND ||--o{ PEER_ANALYSIS : "compared_in"
+    FUND ||--o{ FUND_GROUP_MAPPING : "belongs_to"
+    FUND ||--o{ SHARE_FUND_REQUESTS : "shared_via"
+    
+    FUND_GROUPS ||--o{ FUND_GROUP_MAPPING : "contains"
+    
+    USER ||--o{ FUND_PERMISSIONS : "granted"
+    USER ||--o{ USER_PERMISSIONS : "has"
+    USER ||--o{ INVESTOR_INTRODUCTION : "introduces"
+    USER ||--o{ ANALYTICS_REPORT : "generates"
+    USER ||--o{ FUND_ANALYSIS : "creates"
+    USER ||--o{ SHARE_FUND_REQUESTS : "makes"
+    USER ||--o{ AUDIT_LOG : "performs"
+    
+    CONTENT ||--o{ MARKET_DATA : "references"

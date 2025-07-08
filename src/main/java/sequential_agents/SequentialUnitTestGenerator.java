@@ -10,16 +10,16 @@ import com.google.genai.types.Part;
 import io.reactivex.rxjava3.core.Flowable;
 
 // Create Java Code - LLM
-public class SequentialAgentExample {
+public class SequentialUnitTestGenerator {
 
     private static final String APP_NAME = "CodePipelineAgent";
     private static final String USER_ID = "test_user_456";
     private static final String MODEL_NAME = "gemini-2.0-flash";
 
     public static void main(String[] args) {
-        SequentialAgentExample sequentialAgentExample = new SequentialAgentExample();
+        SequentialUnitTestGenerator sequentialAgentExample = new SequentialUnitTestGenerator();
         sequentialAgentExample.runAgent(
-                "Write a Java program Fast response times, to calculate Standard Deviation of a given list of numbers. Prepare Large dataset for running the code, include Performance Testing code.");
+                "Write a Java program to Calculate Standard Deviation given a list of numbers. Prepare unit tests with a 50MB dataset for the code.");
     }
 //    Write a Java function to find if the string is a Palindrome
 //    Write a Java function to calculate the factorial of a number
@@ -29,8 +29,6 @@ public class SequentialAgentExample {
 //    Write a Java program to lucidly explain through Comments and create a Web Server
 //    Write a Java program to lucidly explain through Comments and create a Web Server that returns the Server Data
 //    Write a Java program to lucidly explain through Comments and Create a Doubly Linked List
-//      Write a Java Program to Read a java File given it's Path and output it as a String
-
 
     public void runAgent(String prompt) {
 
