@@ -18,8 +18,8 @@ public class SequentialAgentExample {
 
     public static void main(String[] args) {
         SequentialAgentExample sequentialAgentExample = new SequentialAgentExample();
-        sequentialAgentExample.runAgent(
-                "Write a Java program Fast response times, to calculate Standard Deviation of a given list of numbers. Prepare Large dataset for running the code, include Performance Testing code.");
+        sequentialAgentExample.runAgent("Write a Java program to lucidly explain through Comments and solve the Dijkstra's Algorithm");
+
     }
 //    Write a Java function to find if the string is a Palindrome
 //    Write a Java function to calculate the factorial of a number
@@ -29,7 +29,11 @@ public class SequentialAgentExample {
 //    Write a Java program to lucidly explain through Comments and create a Web Server
 //    Write a Java program to lucidly explain through Comments and create a Web Server that returns the Server Data
 //    Write a Java program to lucidly explain through Comments and Create a Doubly Linked List
-//      Write a Java Program to Read a java File given it's Path and output it as a String
+//    Write a Java Program to Read a java File given it's Path and output it as a String
+//    Write a Java program Fast response times, to calculate Standard Deviation of a given list of numbers. Prepare Large dataset for running the code, include Performance Testing code.
+//    Write a Java Program to implement the LFU Cache Algorithm. Include unit tests and performance testing.
+//    Write a Java Program to  solve Producer-Consumer Problem - Implement bounded buffer with multiple producers and consumers using semaphores/mutexes
+
 
 
     public void runAgent(String prompt) {

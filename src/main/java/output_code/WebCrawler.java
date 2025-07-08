@@ -160,6 +160,9 @@ public class WebCrawler {
         // Set logging level
         LOGGER.setLevel(Level.INFO);
         crawl("https://emanual.robotis.com/", 100);
+//        crawl("https://www.medium.com/", 100);
+
+
     }
 
     static class RobotsTxtInfo {
