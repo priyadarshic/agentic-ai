@@ -21,7 +21,7 @@ import java.util.Optional;
 public class LlmAgentExample {
 
     // --- 1. Define Constants ---
-    private static final String MODEL_NAME = "gemini-2.0-flash";
+    private static final String MODEL_NAME = "gemini-2.5-flash";
     private static final String APP_NAME = "capital_agent_tool";
     private static final String USER_ID = "test_user_456";
     private static final String SESSION_ID_TOOL_AGENT = "session_tool_agent_xyz";

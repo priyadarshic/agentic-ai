@@ -10,16 +10,19 @@ import com.google.genai.types.Part;
 import io.reactivex.rxjava3.core.Flowable;
 
 // Create Java Code - LLM
-public class SequentialUnitTestGenerator {
+public class LlmSequentialAgentGenerator {
 
     private static final String APP_NAME = "CodePipelineAgent";
     private static final String USER_ID = "test_user_456";
-    private static final String MODEL_NAME = "gemini-2.0-flash";
+//    private static final String USER_ID = "gen-lang-client-0515003257";
+
+    private static final String MODEL_NAME = "gemini-2.5-flash";        // gemini-2.0-flash no longer working
 
     public static void main(String[] args) {
-        SequentialUnitTestGenerator sequentialAgentExample = new SequentialUnitTestGenerator();
+
+        LlmSequentialAgentGenerator sequentialAgentExample = new LlmSequentialAgentGenerator();
         sequentialAgentExample.runAgent(
-                "Write a Java program to Calculate Standard Deviation given a list of numbers. Prepare unit tests with a 50MB dataset for the code.");
+                "Write a java Program to perform Algorithmic Trading");
     }
 //    Write a Java function to find if the string is a Palindrome
 //    Write a Java function to calculate the factorial of a number
@@ -29,6 +32,9 @@ public class SequentialUnitTestGenerator {
 //    Write a Java program to lucidly explain through Comments and create a Web Server
 //    Write a Java program to lucidly explain through Comments and create a Web Server that returns the Server Data
 //    Write a Java program to lucidly explain through Comments and Create a Doubly Linked List
+//    Write a Java program to Calculate Standard Deviation given a list of numbers. Prepare unit tests with a 50MB dataset for the code.
+//    Write a Java program to lucidly explain through Comments and create a Calculate Engine to calculate Returns such as Volatility, Sharpe Ratio and others " +
+//                        "for a given Investment Fund compared to benchmarks like S&P 500. Prepare unit tests with a 50MB dataset for the code
 
     public void runAgent(String prompt) {
 
