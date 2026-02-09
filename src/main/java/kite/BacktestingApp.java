@@ -43,8 +43,8 @@ public class BacktestingApp {
             System.out.println("\n📋 Step 2: Fetch Historical Data");
             
             HistoricalDataFetcher dataFetcher = new HistoricalDataFetcher(
-                API_KEY, 
-                kite.accessToken // You'll need to make this accessible
+                API_KEY,
+                    kite.getAccessToken() // You'll need to make this accessible
             );
             
             // Example: Fetch NIFTY 50 data

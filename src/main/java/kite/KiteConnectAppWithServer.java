@@ -23,7 +23,20 @@ public class KiteConnectAppWithServer {
     
     private String apiKey;
     private String apiSecret;
-    protected String accessToken;
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public String getApiSecret() {
+        return apiSecret;
+    }
+
+    private String accessToken;
     private String userId;
     private HttpServer callbackServer;
     private String capturedRequestToken;
