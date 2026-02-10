@@ -50,11 +50,24 @@ public class BacktestingApp {
             // Example: Fetch NIFTY 50 data
             String exchange = "NSE";
             String tradingSymbol = "NIFTY 50";
-            
+
+            System.out.println("\n Enter Trading Symbol: ");
+            Scanner input = new Scanner(System.in);
+            tradingSymbol = input.nextLine();
+
             System.out.println("\n🔍 Searching for instrument: " + tradingSymbol);
             long instrumentToken = dataFetcher.getInstrumentToken(exchange, tradingSymbol);
+
+            while(instrumentToken == -1)
+            {
+                System.out.println("\nInstrument token Not Found! \nEnter Trading Symbol: ");
+                input = new Scanner(System.in);
+                tradingSymbol = input.nextLine();
+                instrumentToken = dataFetcher.getInstrumentToken(exchange, tradingSymbol);
+            }
             System.out.println("✅ Found instrument token: " + instrumentToken);
-            
+
+
             // Define date range for backtesting
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date fromDate = sdf.parse("2024-01-01");

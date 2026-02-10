@@ -195,7 +195,9 @@ public class HistoricalDataFetcher {
         }
         
         reader.close();
-        throw new Exception("Instrument not found: " + tradingSymbol);
+//        throw new Exception("Instrument not found: " + tradingSymbol);
+        System.out.println("Instrument not found: " + tradingSymbol);
+        return -1;
     }
     
     /**
