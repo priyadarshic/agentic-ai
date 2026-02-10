@@ -23,10 +23,7 @@ public class KiteConnectAppWithServer {
     
     private String apiKey;
     private String apiSecret;
-
-    public String getAccessToken() {
-        return accessToken;
-    }
+    private String accessToken;
 
     public String getApiKey() {
         return apiKey;
@@ -36,11 +33,15 @@ public class KiteConnectAppWithServer {
         return apiSecret;
     }
 
-    private String accessToken;
+    public String getAccessToken() {
+        return accessToken;
+    }
+
     private String userId;
     private HttpServer callbackServer;
     private String capturedRequestToken;
     private CountDownLatch tokenLatch;
+    private volatile boolean tokenCaptured = false;
     
     /**
      * Constructor
@@ -48,7 +49,6 @@ public class KiteConnectAppWithServer {
     public KiteConnectAppWithServer(String apiKey, String apiSecret) {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
-        this.tokenLatch = new CountDownLatch(1);
     }
     
     /**
@@ -62,16 +62,25 @@ public class KiteConnectAppWithServer {
             public void handle(HttpExchange exchange) throws IOException {
                 String query = exchange.getRequestURI().getQuery();
                 
-                System.out.println("\n✅ Callback received!");
-                
-                // Parse request_token from query string
-                if (query != null && query.contains("request_token=")) {
-                    String[] params = query.split("&");
-                    for (String param : params) {
-                        if (param.startsWith("request_token=")) {
-                            capturedRequestToken = param.split("=")[1];
-                            System.out.println("📝 Request token captured: " + capturedRequestToken);
-                            break;
+                // Only process if we haven't captured token yet
+                if (!tokenCaptured && query != null && query.contains("request_token=")) {
+                    synchronized (KiteConnectAppWithServer.this) {
+                        if (!tokenCaptured) { // Double-check inside synchronized block
+                            System.out.println("\n✅ Callback received!");
+                            
+                            // Parse request_token from query string
+                            String[] params = query.split("&");
+                            for (String param : params) {
+                                if (param.startsWith("request_token=")) {
+                                    capturedRequestToken = param.split("=")[1];
+                                    System.out.println("📝 Request token captured: " + capturedRequestToken);
+                                    tokenCaptured = true;
+                                    break;
+                                }
+                            }
+                            
+                            // Signal that token has been captured
+                            tokenLatch.countDown();
                         }
                     }
                 }
@@ -90,9 +99,6 @@ public class KiteConnectAppWithServer {
                 OutputStream os = exchange.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
-                
-                // Signal that token has been captured
-                tokenLatch.countDown();
             }
         });
         
@@ -185,6 +191,10 @@ public class KiteConnectAppWithServer {
      * Automated login flow
      */
     public JSONObject performLogin() throws Exception {
+        // Reset state
+        tokenCaptured = false;
+        tokenLatch = new CountDownLatch(1);
+        
         // Start callback server
         startCallbackServer();
         

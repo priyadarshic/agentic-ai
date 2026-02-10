@@ -3,6 +3,7 @@ package kite;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import org.json.*;
@@ -271,7 +272,7 @@ public class HistoricalDataFetcher {
     /**
      * Load candles from CSV file
      */
-    public List<Candle> loadFromCSV(String filename) throws IOException {
+    public List<Candle> loadFromCSV(String filename) throws IOException, ParseException {
         List<Candle> candles = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         
