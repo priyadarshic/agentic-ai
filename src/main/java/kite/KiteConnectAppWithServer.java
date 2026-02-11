@@ -88,10 +88,25 @@ public class KiteConnectAppWithServer {
                 // Send HTML response to browser
                 String response = "<!DOCTYPE html><html><head><title>Authentication Success</title>" +
                     "<style>body{font-family:Arial,sans-serif;text-align:center;padding:50px;background:#f0f0f0;}" +
-                    "h1{color:#4CAF50;}p{font-size:18px;}</style></head><body>" +
+                    "h1{color:#4CAF50;}p{font-size:18px;}.countdown{font-size:24px;font-weight:bold;color:#4CAF50;}</style>" +
+                    "<script>" +
+                    "var count = 3;" +
+                    "function closeWindow() {" +
+                    "  if(count > 0) {" +
+                    "    document.getElementById('countdown').innerText = count;" +
+                    "    count--;" +
+                    "    setTimeout(closeWindow, 1000);" +
+                    "  } else {" +
+                    "    window.close();" +
+                    "    document.getElementById('message').innerText = 'You can now close this window manually.';" +
+                    "  }" +
+                    "}" +
+                    "window.onload = closeWindow;" +
+                    "</script></head><body>" +
                     "<h1>✅ Authentication Successful!</h1>" +
                     "<p>Request token has been captured.</p>" +
-                    "<p>You can close this window and return to the application.</p>" +
+                    "<p id='message'>This window will close in <span id='countdown' class='countdown'>3</span> seconds...</p>" +
+                    "<p style='color:#666;font-size:14px;margin-top:30px;'>If it doesn't close automatically, you can close it manually.</p>" +
                     "</body></html>";
                 
                 exchange.getResponseHeaders().set("Content-Type", "text/html");
@@ -225,8 +240,8 @@ public class KiteConnectAppWithServer {
         // Exchange for access token
         JSONObject session = generateSession(requestToken);
         
-        // Stop callback server
-        stopCallbackServer();
+        // Note: Server will be stopped later when app exits
+        System.out.println("💡 You can close the browser tab now.");
         
         return session;
     }
@@ -467,8 +482,8 @@ public class KiteConnectAppWithServer {
             
             // Initialize app
             KiteConnectAppWithServer kite = new KiteConnectAppWithServer(API_KEY, API_SECRET);
-            
-            // Perform automated login
+
+            // Perform Login
             JSONObject session = kite.performLogin();
             
             // Display user profile
@@ -585,6 +600,10 @@ public class KiteConnectAppWithServer {
             }
             
             scanner.close();
+            
+            // Now stop the callback server
+            kite.stopCallbackServer();
+            
             System.out.println("\n✅ Application terminated successfully");
             
         } catch (Exception e) {

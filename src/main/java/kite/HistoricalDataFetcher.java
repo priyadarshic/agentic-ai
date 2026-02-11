@@ -140,8 +140,8 @@ public class HistoricalDataFetcher {
         String endpoint = String.format("/instruments/historical/%d/%s?from=%s&to=%s",
             instrumentToken,
             interval.getValue(),
-            URLEncoder.encode(sdf.format(fromDate), "UTF-8"),
-            URLEncoder.encode(sdf.format(toDate), "UTF-8"));
+            URLEncoder.encode(sdf.format(fromDate), StandardCharsets.UTF_8),
+            URLEncoder.encode(sdf.format(toDate), StandardCharsets.UTF_8));
         
         if (includeOI) {
             endpoint += "&oi=1";

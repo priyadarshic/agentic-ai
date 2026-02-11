@@ -60,7 +60,7 @@ public class BacktestingApp {
 
             while(instrumentToken == -1)
             {
-                System.out.println("\nInstrument token Not Found! \nEnter Trading Symbol: ");
+                System.out.println("\nInstrument token Not Found! \n\nEnter Trading Symbol: ");
                 input = new Scanner(System.in);
                 tradingSymbol = input.nextLine();
                 instrumentToken = dataFetcher.getInstrumentToken(exchange, tradingSymbol);
