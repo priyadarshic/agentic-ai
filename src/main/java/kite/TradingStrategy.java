@@ -62,7 +62,14 @@ class Candle {
     
     public Candle(JSONArray candleData) {
         // Parse from Kite API format: [timestamp, open, high, low, close, volume, oi]
-        this.timestamp = new Date(candleData.getString(0));
+        try {
+            // Parse ISO 8601 timestamp: "2024-01-01T00:00:00+0530"
+            String timestampStr = candleData.getString(0);
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            this.timestamp = sdf.parse(timestampStr);
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing timestamp: " + candleData.getString(0), e);
+        }
         this.open = candleData.getDouble(1);
         this.high = candleData.getDouble(2);
         this.low = candleData.getDouble(3);
