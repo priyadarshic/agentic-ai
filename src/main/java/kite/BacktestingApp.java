@@ -1,6 +1,7 @@
 package kite;
 
 import org.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,142 +52,106 @@ public class BacktestingApp {
             Scanner scanner;
             while (true) {
 
+                System.out.print("\n📊 Enter Trading Symbol (e.g., INFY, RELIANCE, TCS): ");
+                scanner = new Scanner(System.in);
+                String tradingSymbol = scanner.nextLine().trim().toUpperCase();
+                if (tradingSymbol.equals("EXIT")) {
+                    break;
+                }
 
+                
+                String exchange = "NSE";
 
-            System.out.print("\n📊 Enter Trading Symbol (e.g., INFY, RELIANCE, TCS): ");
-            scanner = new Scanner(System.in);
-            String tradingSymbol = scanner.nextLine().trim().toUpperCase();
-            if (tradingSymbol.equals("EXIT")) {
-                break;
+                System.out.println("\n🔍 Searching for instrument: " + tradingSymbol);
+                long instrumentToken = dataFetcher.getInstrumentToken(exchange, tradingSymbol);
+                if(instrumentToken == -1) {
+                    System.out.println("Trading symbol not found");
+                    continue;
+                }
+                
+                
+                System.out.println("✅ Found instrument token: " + instrumentToken);
+
+                // Define date range for backtesting
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = sdf.parse("2026-01-10");
+                Date toDate = sdf.parse("2026-02-10");
+    
+                System.out.println("\n📥 Fetching historical data...");
+                System.out.println("   Symbol: " + tradingSymbol);
+                System.out.println("   From: " + sdf.format(fromDate));
+                System.out.println("   To: " + sdf.format(toDate));
+                System.out.println("   Interval: Day");
+
+                List<Candle> historicalData = dataFetcher.fetchHistoricalData(
+                        instrumentToken,
+                        HistoricalDataFetcher.Interval.DAY,
+                        fromDate,
+                        toDate,
+                        false // includeOI
+                );
+
+                System.out.println("✅ Fetched " + historicalData.size() + " candles");
+
+                // Save data to CSV for future use
+                String csvFilename = "historical_data_" + tradingSymbol.replace(" ", "_") + ".csv";
+                dataFetcher.saveToCSV(historicalData, csvFilename);
+
+                // ============================================================
+                // STEP 3: DEFINE STRATEGIES TO TEST
+                // ============================================================
+
+                System.out.println("\n📋 Step 3: Define Trading Strategies");
+
+                List<TradingStrategy> strategies = getTradingStrategies();
+
+                System.out.println("✅ " + strategies.size() + " strategies configured");
+
+                // ============================================================
+                // STEP 4: RUN BACKTESTS
+                // ============================================================
+
+                System.out.println("\n📋 Step 4: Run Backtests");
+
+                double initialCapital = 1_00_000; // ₹1,00,000
+                int quantity = 1; // Trade quantity
+
+                List<BacktestResult> results = new ArrayList<>();
+
+                for (TradingStrategy strategy : strategies) {
+                    BacktestEngine engine = new BacktestEngine(strategy, initialCapital, quantity);
+                    engine.loadHistoricalData(historicalData);
+
+                    BacktestResult result = engine.runBacktest();
+                    engine.printReport(result);
+
+                    results.add(result);
+                }
+
+                // ============================================================
+                // STEP 5: COMPARE STRATEGIES
+                // ============================================================
+
+                System.out.println("\n📋 Step 5: Strategy Comparison");
+                compareStrategies(results);
+
+                // ============================================================
+                // STEP 6: EXPORT RESULTS
+                // ============================================================
+
+                System.out.println("\n📋 Step 6: Export Results");
+
+                for (BacktestResult result : results) {
+                    String filename = "backtest_" +
+                            result.strategyName.replace(" ", "_") + ".csv";
+
+                    java.io.PrintWriter writer = new java.io.PrintWriter(filename);
+                    writer.print(result.toCSV());
+                    writer.close();
+
+                    System.out.println("✅ Exported: " + filename);
+                }
             }
-
-            String exchange = "NSE";
-
-            System.out.println("\n🔍 Searching for instrument: " + tradingSymbol);
-            long instrumentToken = dataFetcher.getInstrumentToken(exchange, tradingSymbol);
-            System.out.println("✅ Found instrument token: " + instrumentToken);
-
-            // Define date range for backtesting
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date fromDate = sdf.parse("2024-01-01");
-            Date toDate = sdf.parse("2024-12-31");
-
-            System.out.println("\n📥 Fetching historical data...");
-            System.out.println("   Symbol: " + tradingSymbol);
-            System.out.println("   From: " + sdf.format(fromDate));
-            System.out.println("   To: " + sdf.format(toDate));
-            System.out.println("   Interval: Day");
-
-            List<Candle> historicalData = dataFetcher.fetchHistoricalData(
-                    instrumentToken,
-                    HistoricalDataFetcher.Interval.DAY,
-                    fromDate,
-                    toDate,
-                    false // includeOI
-            );
-
-            System.out.println("✅ Fetched " + historicalData.size() + " candles");
-
-            // Save data to CSV for future use
-            String csvFilename = "historical_data_" + tradingSymbol.replace(" ", "_") + ".csv";
-            dataFetcher.saveToCSV(historicalData, csvFilename);
-
-            // ============================================================
-            // STEP 3: DEFINE STRATEGIES TO TEST
-            // ============================================================
-
-            System.out.println("\n📋 Step 3: Define Trading Strategies");
-
-            List<TradingStrategy> strategies = new ArrayList<>();
-
-            // Strategy 1: Moving Average Crossover
-            TradingStrategy maCrossover = new MovingAverageCrossoverStrategy();
-            Map<String, Object> maParams = new HashMap<>();
-            maParams.put("fastPeriod", 10);
-            maParams.put("slowPeriod", 20);
-            maCrossover.initialize(maParams);
-            strategies.add(maCrossover);
-
-            // Strategy 2: RSI
-            TradingStrategy rsi = new RSIStrategy();
-            Map<String, Object> rsiParams = new HashMap<>();
-            rsiParams.put("period", 14);
-            rsiParams.put("oversold", 30.0);
-            rsiParams.put("overbought", 70.0);
-            rsi.initialize(rsiParams);
-            strategies.add(rsi);
-
-            // Strategy 3: Bollinger Bands
-            TradingStrategy bb = new BollingerBandsStrategy();
-            Map<String, Object> bbParams = new HashMap<>();
-            bbParams.put("period", 20);
-            bbParams.put("stdDev", 2.0);
-            bb.initialize(bbParams);
-            strategies.add(bb);
-
-            // Strategy 4: MACD
-            TradingStrategy macd = new MACDStrategy();
-            Map<String, Object> macdParams = new HashMap<>();
-            macdParams.put("fast", 12);
-            macdParams.put("slow", 26);
-            macdParams.put("signal", 9);
-            macd.initialize(macdParams);
-            strategies.add(macd);
-
-            // Strategy 5: Breakout
-            TradingStrategy breakout = new BreakoutStrategy();
-            Map<String, Object> breakoutParams = new HashMap<>();
-            breakoutParams.put("lookback", 20);
-            breakout.initialize(breakoutParams);
-            strategies.add(breakout);
-
-            System.out.println("✅ " + strategies.size() + " strategies configured");
-
-            // ============================================================
-            // STEP 4: RUN BACKTESTS
-            // ============================================================
-
-            System.out.println("\n📋 Step 4: Run Backtests");
-
-            double initialCapital = 100000; // ₹1,00,000
-            int quantity = 1; // Trade quantity
-
-            List<BacktestResult> results = new ArrayList<>();
-
-            for (TradingStrategy strategy : strategies) {
-                BacktestEngine engine = new BacktestEngine(strategy, initialCapital, quantity);
-                engine.loadHistoricalData(historicalData);
-
-                BacktestResult result = engine.runBacktest();
-                engine.printReport(result);
-
-                results.add(result);
-            }
-
-            // ============================================================
-            // STEP 5: COMPARE STRATEGIES
-            // ============================================================
-
-            System.out.println("\n📋 Step 5: Strategy Comparison");
-            compareStrategies(results);
-
-            // ============================================================
-            // STEP 6: EXPORT RESULTS
-            // ============================================================
-
-            System.out.println("\n📋 Step 6: Export Results");
-
-            for (BacktestResult result : results) {
-                String filename = "backtest_" +
-                        result.strategyName.replace(" ", "_") + ".csv";
-
-                java.io.PrintWriter writer = new java.io.PrintWriter(filename);
-                writer.print(result.toCSV());
-                writer.close();
-
-                System.out.println("✅ Exported: " + filename);
-            }
-        }
             // Clean up
             scanner.close();
             
@@ -205,7 +170,53 @@ public class BacktestingApp {
             e.printStackTrace();
         }
     }
-    
+
+    private static @NonNull List<TradingStrategy> getTradingStrategies() {
+        List<TradingStrategy> strategies = new ArrayList<>();
+
+        // Strategy 1: Moving Average Crossover
+        TradingStrategy maCrossover = new MovingAverageCrossoverStrategy();
+        Map<String, Object> maParams = new HashMap<>();
+        maParams.put("fastPeriod", 10);
+        maParams.put("slowPeriod", 20);
+        maCrossover.initialize(maParams);
+        strategies.add(maCrossover);
+
+        // Strategy 2: RSI
+        TradingStrategy rsi = new RSIStrategy();
+        Map<String, Object> rsiParams = new HashMap<>();
+        rsiParams.put("period", 14);
+        rsiParams.put("oversold", 30.0);
+        rsiParams.put("overbought", 70.0);
+        rsi.initialize(rsiParams);
+        strategies.add(rsi);
+
+        // Strategy 3: Bollinger Bands
+        TradingStrategy bb = new BollingerBandsStrategy();
+        Map<String, Object> bbParams = new HashMap<>();
+        bbParams.put("period", 20);
+        bbParams.put("stdDev", 2.0);
+        bb.initialize(bbParams);
+        strategies.add(bb);
+
+        // Strategy 4: MACD
+        TradingStrategy macd = new MACDStrategy();
+        Map<String, Object> macdParams = new HashMap<>();
+        macdParams.put("fast", 12);
+        macdParams.put("slow", 26);
+        macdParams.put("signal", 9);
+        macd.initialize(macdParams);
+        strategies.add(macd);
+
+        // Strategy 5: Breakout
+        TradingStrategy breakout = new BreakoutStrategy();
+        Map<String, Object> breakoutParams = new HashMap<>();
+        breakoutParams.put("lookback", 20);
+        breakout.initialize(breakoutParams);
+        strategies.add(breakout);
+        return strategies;
+    }
+
     /**
      * Compare strategies and rank them
      */
