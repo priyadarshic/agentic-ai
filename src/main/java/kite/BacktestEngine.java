@@ -17,8 +17,11 @@ public class BacktestEngine {
     private double currentCapital;
     private int quantity;
     private Trade currentTrade;
+    private boolean includeCosts;
+    private TransactionCostCalculator.TradeType tradeType;
     
     // Performance metrics
+    private double totalCosts;
     private int totalTrades;
     private int winningTrades;
     private int losingTrades;
@@ -28,12 +31,19 @@ public class BacktestEngine {
     private double maxCapital;
     
     public BacktestEngine(TradingStrategy strategy, double initialCapital, int quantity) {
+        this(strategy, initialCapital, quantity, false, TransactionCostCalculator.TradeType.EQUITY_DELIVERY);
+    }
+    
+    public BacktestEngine(TradingStrategy strategy, double initialCapital, int quantity, 
+                         boolean includeCosts, TransactionCostCalculator.TradeType tradeType) {
         this.strategy = strategy;
         this.initialCapital = initialCapital;
         this.currentCapital = initialCapital;
         this.quantity = quantity;
         this.trades = new ArrayList<>();
         this.currentTrade = null;
+        this.includeCosts = includeCosts;
+        this.tradeType = tradeType;
         
         resetMetrics();
     }
@@ -46,6 +56,7 @@ public class BacktestEngine {
         this.totalLoss = 0;
         this.maxDrawdown = 0;
         this.maxCapital = initialCapital;
+        this.totalCosts = 0;
     }
     
     /**
@@ -122,6 +133,16 @@ public class BacktestEngine {
      */
     private void closePosition(Candle candle, String reason) {
         currentTrade.close(candle.timestamp, candle.close);
+        
+        // Calculate transaction costs
+        double costs = 0;
+        if (includeCosts) {
+            double tradeValue = currentTrade.entryPrice * currentTrade.quantity;
+            costs = TransactionCostCalculator.calculateRoundTripCost(tradeValue, tradeType);
+            currentTrade.pnl -= costs; // Deduct costs from P&L
+            totalCosts += costs;
+        }
+        
         trades.add(currentTrade);
         
         // Update capital
@@ -146,11 +167,13 @@ public class BacktestEngine {
             maxDrawdown = drawdown;
         }
         
+        String costStr = includeCosts ? String.format(" | Costs: %.2f", costs) : "";
         System.out.println("📉 CLOSE " + currentTrade.type + " | " + 
-            String.format("%.2f @ %s | P&L: %.2f | Reason: %s", 
+            String.format("%.2f @ %s | P&L: %.2f%s | Reason: %s", 
             candle.close, 
             new SimpleDateFormat("yyyy-MM-dd HH:mm").format(candle.timestamp),
             currentTrade.pnl,
+            costStr,
             reason));
         
         currentTrade = null;
@@ -175,6 +198,7 @@ public class BacktestEngine {
         result.totalLoss = totalLoss;
         result.profitFactor = totalLoss > 0 ? totalProfit / totalLoss : 0;
         result.maxDrawdown = maxDrawdown;
+        result.totalCosts = totalCosts;
         result.trades = new ArrayList<>(trades);
         
         // Calculate additional metrics
@@ -215,6 +239,10 @@ public class BacktestEngine {
         System.out.println("   Winning Trades:     " + result.winningTrades);
         System.out.println("   Losing Trades:      " + result.losingTrades);
         System.out.println("   Win Rate:           " + String.format("%.2f%%", result.winRate));
+        if (result.totalCosts > 0) {
+            System.out.println("   Total Costs:        ₹" + String.format("%,.2f", result.totalCosts));
+            System.out.println("   Avg Cost/Trade:     ₹" + String.format("%.2f", result.totalCosts / result.totalTrades));
+        }
         
         System.out.println("\n💰 PROFIT & LOSS");
         System.out.println("   Total Profit:       ₹" + String.format("%,.2f", result.totalProfit));
@@ -261,6 +289,7 @@ class BacktestResult {
     public double largestWin;
     public double largestLoss;
     public double maxDrawdown;
+    public double totalCosts;
     public List<Trade> trades;
     
     /**
